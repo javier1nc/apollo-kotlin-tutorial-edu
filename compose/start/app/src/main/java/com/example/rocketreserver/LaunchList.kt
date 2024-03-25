@@ -40,12 +40,12 @@ fun LaunchList(onLaunchClick: (launchId: String) -> Unit) {
 }
 
 @Composable
-private fun LaunchItem(launchId: String, onClick: (launchId: String) -> Unit) {
+private fun LaunchItem(launch: LaunchListQuery.Launch, onClick: (launchId: String) -> Unit) {
     ListItem(
-        modifier = Modifier.clickable { onClick(launchId) },
+        modifier = Modifier.clickable { onClick(launch.id) },
         headlineContent = {
             // Mission name
-            Text(text = "Launch $launchId")
+            Text(text = "Launch ${launch.id}")
         },
         supportingContent = {
             // Site
