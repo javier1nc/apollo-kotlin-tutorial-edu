@@ -35,7 +35,14 @@ fun LaunchList(onLaunchClick: (launchId: String) -> Unit) {
     var launchList by remember { mutableStateOf(emptyList<LaunchListQuery.Launch>()) }
     LaunchedEffect(Unit) {
         val response = apolloClient.query(LaunchListQuery()).execute()
-        Log.d("LaunchList", "Success ${response.data}")
+        launchList = response.data?.launches?.launches?.filterNotNull() ?: emptyList()
+        //Log.d("LaunchList", "Success ${response.data}")
+    }
+
+    LazyColumn {
+        items(launchList) { launch ->
+            LaunchItem(launch = launch, onClick = onLaunchClick)
+        }
     }
 }
 
