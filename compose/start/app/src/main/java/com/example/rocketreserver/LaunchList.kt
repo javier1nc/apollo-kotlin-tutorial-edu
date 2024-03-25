@@ -36,7 +36,8 @@ fun LaunchList(onLaunchClick: (launchId: String) -> Unit) {
     LaunchedEffect(Unit) {
         val response = apolloClient.query(LaunchListQuery()).execute()
         launchList = response.data?.launches?.launches?.filterNotNull() ?: emptyList()
-        //Log.d("LaunchList", "Success ${response.data}") 
+        // Note: the .filterNotNull() is necessary because the schema defines launches as a list of nullable Launch objects.
+        //Log.d("LaunchList", "Success ${response.data}")
     }
 
     LazyColumn {
@@ -52,17 +53,19 @@ private fun LaunchItem(launch: LaunchListQuery.Launch, onClick: (launchId: Strin
         modifier = Modifier.clickable { onClick(launch.id) },
         headlineContent = {
             // Mission name
-            Text(text = "Launch ${launch.id}")
+            Text(text = launch.mission?.name ?: "")
         },
         supportingContent = {
             // Site
-            Text(text = "Site...")
+            Text(text = launch.site ?: "")
         },
         leadingContent = {
             // Mission patch
-            Image(
+            AsyncImage(
                 modifier = Modifier.size(68.dp, 68.dp),
-                painter = painterResource(R.drawable.ic_placeholder),
+                model = launch.mission?.missionPatch,
+                placeholder = painterResource(R.drawable.ic_placeholder),
+                error = painterResource(R.drawable.ic_placeholder),
                 contentDescription = "Mission patch"
             )
         }
