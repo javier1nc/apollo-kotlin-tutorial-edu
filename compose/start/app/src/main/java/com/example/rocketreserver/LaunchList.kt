@@ -32,10 +32,12 @@ import com.apollographql.apollo3.api.Optional
 
 @Composable
 fun LaunchList(onLaunchClick: (launchId: String) -> Unit) {
+    var cursor: String? by remember { mutableStateOf(null) }
+    var response: ApolloResponse<LaunchListQuery.Data>? by remember { mutableStateOf(null) }
     var launchList by remember { mutableStateOf(emptyList<LaunchListQuery.Launch>()) }
-    LaunchedEffect(Unit) {
-        val response = apolloClient.query(LaunchListQuery()).execute()
-        launchList = response.data?.launches?.launches?.filterNotNull() ?: emptyList()
+    LaunchedEffect(cursor) {
+        response = apolloClient.query(LaunchListQuery(Optional.present(cursor))).execute()
+        launchList = launchList + response?.data?.launches?.launches?.filterNotNull().orEmpty()
         // Note: the .filterNotNull() is necessary because the schema defines launches as a list of nullable Launch objects.
         //Log.d("LaunchList", "Success ${response.data}")
     }
@@ -43,6 +45,13 @@ fun LaunchList(onLaunchClick: (launchId: String) -> Unit) {
     LazyColumn {
         items(launchList) { launch ->
             LaunchItem(launch = launch, onClick = onLaunchClick)
+        }
+
+        item {
+            if (response?.data?.launches?.hasMore == true) {
+                LoadingItem()
+                cursor = response?.data?.launches?.cursor
+            }
         }
     }
 }
