@@ -38,7 +38,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 private fun MainNavHost() {
     val navController = rememberNavController()
-    NavHost(navController, startDestination = NavigationDestinations.LAUNCH_LIST) {
+    NavHost(navController, startDestination = NavigationDestinations.LOGIN) {
         composable(route = NavigationDestinations.LAUNCH_LIST) {
             LaunchList(
                 onLaunchClick = { launchId ->
@@ -52,7 +52,11 @@ private fun MainNavHost() {
         }
 
         composable(route = NavigationDestinations.LOGIN) {
-            Login()
+            Login(
+                navigateBack = {
+                    navController.popBackStack()
+                }
+            )
         }
     }
 }
